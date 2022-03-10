@@ -1,7 +1,7 @@
 #pragma once
 
-const int downSetpoint = -955;
-const int upSetpoint = -625;
+const int downSetpoint = -920;
+const int upSetpoint = -500;
 const int middleSetpoint = -725;
 
 void initForklift();

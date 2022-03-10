@@ -7,11 +7,33 @@ void initForklift() {
 }
 
 void forkliftUp(bool waitForCompletion) {
-  ForkLiftMotorGroup.spinTo(upSetpoint, degrees, 50, velocityUnits::pct, waitForCompletion);
+  initForklift();
+  ForkLiftMotorGroup.spinTo(500, degrees, 100, velocityUnits::pct, waitForCompletion);
+}
+
+int forkliftDownTask() {
+  while (true) {
+    if (BumperA.pressing()) {
+      break;
+    }
+    else {
+      ForkLiftMotorGroup.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+    }
+
+    vex::task::sleep(20);
+  }
+
+  ForkLiftMotorGroup.stop(vex::brakeType::brake);
+  return 0;
 }
 
 void forkliftDown(bool waitForCompletion) {
-  ForkLiftMotorGroup.spinTo(downSetpoint, degrees, 100, velocityUnits::pct, waitForCompletion);
+  if (waitForCompletion) {
+    forkliftDownTask();
+  }
+  else {
+    vex::task t(forkliftDownTask);
+  }
 }
 
 void forkliftMiddle(bool waitForCompletion) {

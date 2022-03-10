@@ -32,14 +32,19 @@
 #include "vex.h"
 #include "drive.h"
 #include "forklift.h"
-#include "forklift2.h"
-#include "flippy.h"
+#include "UI.h"
+#include "hook.h"
+#include "Button.h"
 
 using namespace vex;
 
 // A global instance of competition
 competition Competition;
+int autoSelection = 2;
+int alliance = 0;
 
+extern int g_autonSelection;
+extern int g_redOrBlue;
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
@@ -55,6 +60,9 @@ competition Competition;
 void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
+  initForklift();
+  initDrive();
+  initHook();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -68,89 +76,63 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  initForklift();
-  initForklift2();
-  initFlippy();
-  initDrive();
+  if (g_autonSelection == 0) {
 
-  // // While going forward, put the forklift down
-  // forkliftDown(false);
-  // vex::task::sleep(400);
-  // autoStraightDrive(45, true, 100);
-  // autoStraightDrive(11,false,50);
-  
-  // // Lift up the goal and come back, put the forklift in middle, forkLift2 up
-  // forkliftUp(true);
-  // vex::task::sleep(300);
-  // autoStraightDrive(-32.5,true,100);
-  // vex::task::sleep(100);
+    autoStraightDriveWithPID(-48, 1300);
+    hookDown(true, 1000);
+    forkliftDown(false);
+    autoStraightDriveWithPID(34, 1000);
+    hookUp(true, 2000);
+    autoStraightDriveWithPID(21, 500);
+    turnToAngle(180);
+    targetDrive(45, VisionSensor__SIG_YELLOW, 2500);
+    autoStraightDrive(30,false,75);
+    vex::task::sleep(450);
+    forkliftUp(false);    
+    vex::task::sleep(850);
+    autoStraightDriveWithPID(-40, 1750);
+  }
 
-  // // Turn sideways, go forward and drop the first goal
-  // turnToAngle(-101);
-  // // vex::task::sleep(100);
-  // forkliftDown(false);
-  // autoStraightDrive(20, true, 100);
-  // vex::task::sleep(200);
-  // flipSupport(false);
+  if (g_autonSelection == 1) {
+    autoStraightDriveWithPID(-48, 2000);
+    hookDown(true, 2000);    
+    turnToAngle(15);
 
-  // // Come back and aim for center goal
-  // autoStraightDrive(-16,true,100);
-  // vex::task::sleep(200);
-  // turnToAngle(45);
+    forkliftDown(false);
+    autoStraightDrive(38, true, 100);
+    hookUp(true);
+    
+    vex::task::sleep(400);
+    turnToAngle(-100);
+    vex::task::sleep(100);
 
-  // // Go pick center goal and come back
-  // autoStraightDrive(32,true,75);
-  // forkliftBoost(false);
-  // autoStraightDrive(13.75,true,50);
-  // vex::task::sleep(400);
-  // autoStraightDrive(-63,true,100);
-  // forkliftDown(false);
-  // turnToAngle(-60);
-  // autoStraightDrive(-15,true,75);
-  // forkliftDown(true);
-  // flipDown(true);
+    if (g_redOrBlue == 0)
+      targetDrive(16, VisionSensor__SIG_RED, 2000);
+    else
+      targetDrive(16, VisionSensor__SIG_BLUE, 2000);
 
-  //left
-  autoStraightDrive(-4,true,75);
-  autoStraightDrive(-12,false,25);
-  flipDown(true);
-  vex::task::sleep(400);
-  autoStraightDrive(10,true,75);
-  forkliftDown(false);
-  turnToAngle(155);
-  flipSupport(false);
+    autoStraightDrive(8, false, 50);
+    forkliftUp(true);
+  }
 
-  // Go pick center goal and come back
-  autoStraightDrive(60,true,100);
-  forkliftBoost(false);
-  autoStraightDrive(13.75,true,50);
-  vex::task::sleep(400);
-  autoStraightDrive(-50,true,100);
-  turnToAngle(-65);
-  autoStraightDrive(15,true,100);
-  forkliftDown(true);
-  
-  // forkliftDown(false);
-  // turnToAngle(-60);
-  // autoStraightDrive(-15,true,75);
-  // forkliftDown(true);
-  // flipDown(true);
+  if (g_autonSelection == 2) {
+    autoStraightDriveWithPID(-76,2250);
+    hookDown(true,1000);
+    forkliftDown(false);
+    autoStraightDriveWithPID(50,1500);
+    hookUp(true);
+    turnToAngle(-45);
 
+    if (g_redOrBlue == 0)
+      targetDrive(30, VisionSensor__SIG_RED, 2000);
+    else
+      targetDrive(30, VisionSensor__SIG_BLUE, 2000);
 
-
-  // forkliftMiddle(false);
-  // vex::task::sleep(100);
-  // flipDown(true);
-  // vex::task::sleep(200);
-  // autoStraightDrive(5,true,50);
-  // flipSupport(false);
-  // turnToAngle(150);
-  // autoStraightDrive(24,true,75);
-  // forkliftDown(false);
-  // autoStraightDrive(41,true,75);
-  // forkliftBoost(false);
-  // autoStraightDrive(5,true,50);
-
+    forkliftUp(false);
+    turnToAngle(45);
+    vex::task::sleep(200);
+    ringLoader.spin(fwd,100,vex::velocityUnits::pct);
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -164,94 +146,67 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  initForklift();
-  initForklift2();
-  initFlippy();
-  initDrive();
+  LeftMotorGroup.setStopping(coast);
+  RightMotorGroup.setStopping(coast);
 
   while (1) {
   
     tankDrive((Controller1.Axis3.value() + Controller1.Axis4.value())/2, (Controller1.Axis3.value() - Controller1.Axis4.value())/2);
 
-
-
     if(Controller1.ButtonR1.pressing()) {
-      ForkLiftMotorGroup.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+      ForkLiftMotorGroup.spin(vex::directionType::fwd, 127, vex::velocityUnits::pct);
     }
     else if(Controller1.ButtonR2.pressing()) {
-      ForkLiftMotorGroup.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+      ForkLiftMotorGroup.spin(vex::directionType::rev, 127, vex::velocityUnits::pct);
     }
     else{
       ForkLiftMotorGroup.stop(vex::brakeType::brake);
     }
 
+    // Brain.Screen.print(ForkLiftMotorGroup.position(degrees));
+    // Brain.Screen.newLine();
+
+    if(Controller1.Axis2.value() > 0) {
+      ringLoader.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+    }
+    else if(Controller1.Axis2.value()<0) {
+      ringLoader.spin(vex::directionType::rev,100, vex::velocityUnits::pct);
+    }
+    else {
+      ringLoader.stop(vex::brakeType::brake);
+    }   
 
     if(Controller1.ButtonL1.pressing()) {
-      ForkLift2.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
+      hook.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
     }
     else if(Controller1.ButtonL2.pressing()) {
-      ForkLift2.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
+      hook.spin(vex::directionType::rev, 100, vex::velocityUnits::pct);
     }
     else{
-      ForkLift2.stop(vex::brakeType::brake);
+      hook.stop(vex::brakeType::brake);
     }
 
-
-    if(Controller1.ButtonB.pressing()) {
-      Flip.spin(vex::directionType::fwd, 5, vex::velocityUnits::pct);
-    }
-    else if(Controller1.ButtonA.pressing()) {
-      Flip.spin(vex::directionType::rev, 5, vex::velocityUnits::pct);
-    }
-    else{
-      Flip.stop(vex::brakeType::brake);
-    }
-
-
-    if(Controller1.ButtonY.pressing()) {
+    if(Controller1.ButtonA.pressing()) {
       RightMotorGroup.spin(vex::directionType::fwd,100,vex::velocityUnits::pct);
       LeftMotorGroup.spin(vex::directionType::fwd,100,vex::velocityUnits::pct);
     }
 
-    
-    
-  
-
-
-
-    Brain.Screen.print(Flip.position(degrees));
-    Brain.Screen.newLine();
-
-    
-  
-  
-    
-  
-  
-
-  
-    
-
-    // // Inertial1.setRotation(0, degrees);
-    // double rawcurrent = Inertial1.rotation(degrees);
-    // // char buf[15];
-    // // sprintf(buf, "%f %f %f %f", rawcurrent, current, error, output);
-    
+    if(Controller1.ButtonB.pressing()) {
+      RightMotorGroup.spin(vex::directionType::fwd,-100,vex::velocityUnits::pct);
+      LeftMotorGroup.spin(vex::directionType::fwd,-100,vex::velocityUnits::pct);
+    }
 
     wait(20, msec); 
   }
 }
 
-
 int main() {
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
-
-  // Run the pre-autonomous function.
+  initButtons();
   pre_auton();
 
-  // Prevent main from exiting with an infinite loop.
-  while (true) {
-    wait(100, msec);
-  }
+  // v5_lv_init();
+  // vpi::ui::uiInit();
+
+  Competition.autonomous(autonomous);
+  Competition.drivercontrol(usercontrol);
 }
