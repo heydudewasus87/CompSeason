@@ -32,7 +32,6 @@
 #include "vex.h"
 #include "drive.h"
 #include "forklift.h"
-#include "UI.h"
 #include "hook.h"
 #include "Button.h"
 
@@ -40,9 +39,6 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-int autoSelection = 2;
-int alliance = 0;
-
 extern int g_autonSelection;
 extern int g_redOrBlue;
 // define your global instances of motors and other devices here
@@ -76,7 +72,75 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+
   if (g_autonSelection == 0) {
+
+      forkliftDown(true);
+      // vex::task::sleep(100);
+      autoStraightDrive(30,false,75);
+      vex::task::sleep(450);
+      forkliftUp(true);
+      vex::task::sleep(550);
+      autoStraightDrive(-25,true,50);
+      vex::task::sleep(500);
+      ringLoader.spinFor(vex::directionType::fwd, 6000, msec, 100, vex::velocityUnits::pct);
+      forkliftDown(true);
+  }
+
+  if (g_autonSelection == 1) {
+    autoStraightDriveWithPID(-48, 1800);
+    hookDown(true, 2000);    
+    turnToAngle(15);
+
+    forkliftDown(false);
+    autoStraightDrive(38, true, 100);
+    hookUp(true,1000);
+    
+    vex::task::sleep(400);
+    turnToAngle(-100);
+    vex::task::sleep(100);
+
+    if (g_redOrBlue == 0)
+      targetDrive(16, VisionSensor__SIG_RED, 2000);
+    else
+      targetDrive(16, VisionSensor__SIG_BLUE, 2000);
+
+    autoStraightDrive(8, false, 50);
+    forkliftUp(true);
+    vex::task::sleep(500);
+    autoStraightDrive(-15, true, 50);
+    ringLoader.spinFor(vex::directionType::fwd, 4000, msec, 100, vex::velocityUnits::pct);
+    forkliftDown(true);
+  }
+
+  if (g_autonSelection == 2) {
+
+    autoStraightDriveWithPID(-48, 1300);
+    hookDown(true, 1000);
+    forkliftDown(false);
+    turnToAngle(20);
+    autoStraightDriveWithPID(40, 1000);
+    hookUp(true, 2000);
+    turnToAngle(-135);
+
+    if (g_redOrBlue == 0)
+      targetDrive(36, VisionSensor__SIG_RED, 3000);
+    else
+      targetDrive(36, VisionSensor__SIG_BLUE, 3000);
+
+    forkliftUp(false);
+    turnToAngle(110);
+    vex::task::sleep(200);
+    ringLoader.spinFor(vex::directionType::fwd, 3000, msec, 100, vex::velocityUnits::pct);
+    vex::task::sleep(300);
+    // autoStraightDrive(-10,true,50);
+    // autoStraightDrive(10,true,75);
+    forkliftDown(true);
+
+  }
+
+
+  if (g_autonSelection == 3) {
 
     autoStraightDriveWithPID(-48, 1300);
     hookDown(true, 1000);
@@ -93,29 +157,7 @@ void autonomous(void) {
     autoStraightDriveWithPID(-40, 1750);
   }
 
-  if (g_autonSelection == 1) {
-    autoStraightDriveWithPID(-48, 2000);
-    hookDown(true, 2000);    
-    turnToAngle(15);
-
-    forkliftDown(false);
-    autoStraightDrive(38, true, 100);
-    hookUp(true);
-    
-    vex::task::sleep(400);
-    turnToAngle(-100);
-    vex::task::sleep(100);
-
-    if (g_redOrBlue == 0)
-      targetDrive(16, VisionSensor__SIG_RED, 2000);
-    else
-      targetDrive(16, VisionSensor__SIG_BLUE, 2000);
-
-    autoStraightDrive(8, false, 50);
-    forkliftUp(true);
-  }
-
-  if (g_autonSelection == 2) {
+  if (g_autonSelection == 4) {
     autoStraightDriveWithPID(-76,2250);
     hookDown(true,1000);
     forkliftDown(false);
@@ -129,9 +171,13 @@ void autonomous(void) {
       targetDrive(30, VisionSensor__SIG_BLUE, 2000);
 
     forkliftUp(false);
-    turnToAngle(45);
+    turnToAngle(110);
     vex::task::sleep(200);
-    ringLoader.spin(fwd,100,vex::velocityUnits::pct);
+    ringLoader.spinFor(vex::directionType::fwd, 3000, msec, 100, vex::velocityUnits::pct);
+    vex::task::sleep(300);
+    // autoStraightDrive(-10,true,50);
+    // autoStraightDrive(10,true,75);
+    forkliftDown(true);
   }
 }
 
@@ -166,15 +212,23 @@ void usercontrol(void) {
     // Brain.Screen.print(ForkLiftMotorGroup.position(degrees));
     // Brain.Screen.newLine();
 
+    if(BumperH.pressing()){
+    Controller1.rumble("----");
+    }
+
     if(Controller1.Axis2.value() > 0) {
       ringLoader.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
     }
     else if(Controller1.Axis2.value()<0) {
-      ringLoader.spin(vex::directionType::rev,100, vex::velocityUnits::pct);
+      ringLoader.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
     }
     else {
       ringLoader.stop(vex::brakeType::brake);
     }   
+
+    if(Controller1.ButtonDown.pressing()) {
+      ringLoader.spin(vex::directionType::rev,100,vex::velocityUnits::pct);
+    }
 
     if(Controller1.ButtonL1.pressing()) {
       hook.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
@@ -201,11 +255,10 @@ void usercontrol(void) {
 }
 
 int main() {
+  printf("Initial %d\n", g_redOrBlue);
+
   initButtons();
   pre_auton();
-
-  // v5_lv_init();
-  // vpi::ui::uiInit();
 
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);

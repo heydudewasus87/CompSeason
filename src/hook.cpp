@@ -7,6 +7,7 @@ void initHook() {
   hook.setPosition(0, degrees);
 }
 
+
 void hookDown(bool waitForCompletion, uint32_t timeLimit) {
   if (waitForCompletion and timeLimit > 0) {
     vex::timer t = timer();

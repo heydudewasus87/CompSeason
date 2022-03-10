@@ -28,6 +28,7 @@ signature VisionSensor__SIG_5 = signature (5, 0, 0, 0, 0, 0, 0, 2.1, 0);
 vision VisionSensor = vision (PORT8, 50, VisionSensor__SIG_BLUE, VisionSensor__SIG_RED, VisionSensor__SIG_YELLOW, VisionSensor__SIG_YELLOW2, VisionSensor__SIG_5);
 /*vex-vision-config:end*/
 bumper BumperA = bumper(Brain.ThreeWirePort.A);
+bumper BumperH = bumper(Brain.ThreeWirePort.H);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable

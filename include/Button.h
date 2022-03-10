@@ -42,11 +42,6 @@ void initButtons();
 
 extern button buttonsColor[];
 extern button buttonsAuton[];
-extern int g_autonSelection;
-extern int g_redOrBlue;
 
 #define AUTON_SELECTOR_RED_SIDE 0
 #define AUTON_SELECTOR_BLUE_SIDE 1
-
-#define AUTON_SELECTOR_DEFAULT 1
-#define AUTON_SELECTOR_COLOR_DEFAULT AUTON_SELECTOR_RED_SIDE
