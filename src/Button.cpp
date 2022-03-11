@@ -8,7 +8,7 @@ using namespace vex;
 #define AUTON_BUTTONS_WIDTH 60
 #define AUTON_BUTTONS_HEIGHT 50
 
-#define AUTON_SELECTOR_DEFAULT 4
+#define AUTON_SELECTOR_DEFAULT 1
 #define AUTON_SELECTOR_COLOR_DEFAULT AUTON_SELECTOR_RED_SIDE
 
 button buttonsAuton[] = {

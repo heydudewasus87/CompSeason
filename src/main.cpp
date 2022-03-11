@@ -94,9 +94,9 @@ void autonomous(void) {
 
     forkliftDown(false);
     autoStraightDrive(38, true, 100);
-    hookUp(true,1000);
+    hookUp(false);
+    vex::task::sleep(1000);
     
-    vex::task::sleep(400);
     turnToAngle(-100);
     vex::task::sleep(100);
 
@@ -212,10 +212,6 @@ void usercontrol(void) {
     // Brain.Screen.print(ForkLiftMotorGroup.position(degrees));
     // Brain.Screen.newLine();
 
-    if(BumperH.pressing()){
-    Controller1.rumble("----");
-    }
-
     if(Controller1.Axis2.value() > 0) {
       ringLoader.spin(vex::directionType::fwd, 100, vex::velocityUnits::pct);
     }
@@ -228,6 +224,27 @@ void usercontrol(void) {
 
     if(Controller1.ButtonDown.pressing()) {
       ringLoader.spin(vex::directionType::rev,100,vex::velocityUnits::pct);
+    }
+
+    if(Controller1.ButtonX.pressing()) {
+      Motor9.spin(vex::directionType::fwd,100,vex::velocityUnits::pct);
+    }
+
+    else if(Controller1.ButtonY.pressing()) {
+      Motor9.spin(vex::directionType::rev,100,vex::velocityUnits::pct);
+    }
+
+    else{
+      Motor9.stop(vex::brakeType::brake);
+    }
+
+    if(BumperH.pressing()) {
+      Controller1.Screen.clearScreen();
+      Controller1.Screen.setCursor(1,1);
+      Controller1.Screen.print("SOUMIL LOAD THE RINGS");
+    }
+    else{
+      Controller1.Screen.clearScreen();
     }
 
     if(Controller1.ButtonL1.pressing()) {

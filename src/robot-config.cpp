@@ -22,13 +22,14 @@ motor ForkLiftMotorGroup = motor(PORT5, ratio36_1, false);
 /*vex-vision-config:begin*/
 signature VisionSensor__SIG_BLUE = signature (1, -3693, -2791, -3242, 9633, 12887, 11260, 3, 0);
 signature VisionSensor__SIG_RED = signature (2, 6953, 9657, 8305, -1221, 1, -610, 2.5, 0);
-signature VisionSensor__SIG_YELLOW = signature (3, -45, 955, 455, -3181, -883, -2032, 1.2, 0);
+signature VisionSensor__SIG_YELLOW = signature (3, 45, 2105, 1075, -3823, -1169, -2496, 1.2, 0);
 signature VisionSensor__SIG_YELLOW2 = signature (4, 0, 0, 0, 0, 0, 0, 3, 0);
 signature VisionSensor__SIG_5 = signature (5, 0, 0, 0, 0, 0, 0, 2.1, 0);
 vision VisionSensor = vision (PORT8, 50, VisionSensor__SIG_BLUE, VisionSensor__SIG_RED, VisionSensor__SIG_YELLOW, VisionSensor__SIG_YELLOW2, VisionSensor__SIG_5);
 /*vex-vision-config:end*/
 bumper BumperA = bumper(Brain.ThreeWirePort.A);
 bumper BumperH = bumper(Brain.ThreeWirePort.H);
+motor Motor9 = motor(PORT9, ratio36_1, false);
 
 // VEXcode generated functions
 // define variable for remote controller enable/disable
